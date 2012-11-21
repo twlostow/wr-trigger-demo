@@ -1,0 +1,55 @@
+-- -*- Mode: LUA; tab-width: 2 -*-
+
+peripheral {
+   name = "Trigger shared module";
+   hdl_entity = "trigger_shared_wb";
+   prefix = "tts";
+
+   reg {
+      name = "CR";
+      prefix = "CR";
+
+      field {
+         name = "Configured";
+         description = "Informs whether the device is already configured";
+         prefix = "CONFIGURED";
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+         type = BIT;
+      };
+
+      field {
+         name = "Clear Trigger Detection Buffer";
+         prefix = "CLEAR_TDB";
+         type = MONOSTABLE;
+      };
+   };
+
+   reg {
+      name = "Firmware ID";
+      prefix = "IDR";
+
+      field {
+         description = "Type of the firmware: 0 = DIO, 1 = Fine Delay";
+         prefix = "FW_ID";
+         access_bus = READ_ONLY;
+         access_dev = WRITE_ONLY;
+         type = SLV;
+         size = 8;
+      };
+   };
+   
+   ram {
+      name = "Trigger Detection Buffer";
+
+			 size = 32;
+			 width = 32;
+			 
+			 access_dev = READ_WRITE;
+			 access_bus = READ_WRITE;
+
+			 prefix = "tdb_ram";
+
+   };
+
+};

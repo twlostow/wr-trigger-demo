@@ -1,0 +1,134 @@
+-- -*- Mode: LUA; tab-width: 2 -*-
+
+peripheral {
+   name = "Trigger RX module";
+   hdl_entity = "trigger_rx_wb";
+   prefix = "trx";
+
+   reg {
+      prefix = "CR";
+      name = "Control Register";
+
+      field {
+         name = "Enable";
+         description = "Enable trigger broadcasting for given channel";
+         prefix = "ENABLE";
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+         type = BIT;
+      };
+
+      field {
+         name = "Reset counters";
+         prefix = "RST_CNT";
+         type = MONOSTABLE;
+      };
+      
+      field {
+         name = "Reset histogram";
+         prefix = "RST_HIST";
+         type = MONOSTABLE;
+      };
+
+      field {
+         name = "Broadcast Trigger ID";
+         description = "Receive triggers matching given ID";
+         prefix = "ID";
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+         type = SLV;
+         size = 16;
+      };
+
+   };
+   
+   reg {
+      name = "Received trigger counter register";
+      prefix = "CNTR_RX";
+     
+      field {
+         name = "Trigger count";
+         size = 32;
+         type = SLV;
+         access_bus = READ_ONLY;
+         access_dev = WRITE_ONLY;
+      };
+   };
+
+   reg {
+      name = "Executed trigger counter register";
+      prefix = "CNTR_EXEC";
+     
+      field {
+         name = "Trigger count";
+         size = 32;
+         type = SLV;
+         access_bus = READ_ONLY;
+         access_dev = WRITE_ONLY;
+      };
+   };
+
+   reg {
+      name = "RX Histogram bias";
+      prefix = "RX_HIST_BIAS";
+      field {
+         name = "H Bias";
+         size = 28;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+
+   reg {
+      name = "RX Histogram Scale";
+      prefix = "RX_HIST_SCALE";
+      field {
+         name = "H Scale";
+         size = 18;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+
+   
+   reg {
+      name = "RX trigger delay (cycles)";
+      prefix = "DELAY_C";
+     
+      field {
+         name = "Reference clock cycles";
+         size = 28;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+
+   reg {
+      name = "RX trigger delay (sub-cycle)";
+      prefix = "DELAY_F";
+
+      field {
+         name = "Fractional part";
+         size = 12;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+
+  ram {
+      name = "Delay Histogram Buffer";
+
+			 size = 512;
+			 width = 32;
+			 
+			 access_dev = READ_WRITE;
+			 access_bus = READ_WRITE;
+
+			 prefix = "dhb_ram";
+
+   };
+};

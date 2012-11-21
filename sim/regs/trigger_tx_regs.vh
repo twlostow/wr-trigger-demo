@@ -1,0 +1,10 @@
+`define ADDR_TTX_CR                    4'h0
+`define TTX_CR_ENABLE_OFFSET 0
+`define TTX_CR_ENABLE 32'h00000001
+`define TTX_CR_RST_CNT_OFFSET 1
+`define TTX_CR_RST_CNT 32'h00000002
+`define TTX_CR_ID_OFFSET 2
+`define TTX_CR_ID 32'h0003fffc
+`define ADDR_TTX_CNTR                  4'h4
+`define ADDR_TTX_ADJ_C                 4'h8
+`define ADDR_TTX_ADJ_F                 4'hc

@@ -1,0 +1,17 @@
+`define ADDR_TRX_CR                    12'h0
+`define TRX_CR_ENABLE_OFFSET 0
+`define TRX_CR_ENABLE 32'h00000001
+`define TRX_CR_RST_CNT_OFFSET 1
+`define TRX_CR_RST_CNT 32'h00000002
+`define TRX_CR_RST_HIST_OFFSET 2
+`define TRX_CR_RST_HIST 32'h00000004
+`define TRX_CR_ID_OFFSET 3
+`define TRX_CR_ID 32'h0007fff8
+`define ADDR_TRX_CNTR_RX               12'h4
+`define ADDR_TRX_CNTR_EXEC             12'h8
+`define ADDR_TRX_RX_HIST_BIAS          12'hc
+`define ADDR_TRX_RX_HIST_SCALE         12'h10
+`define ADDR_TRX_DELAY_C               12'h14
+`define ADDR_TRX_DELAY_F               12'h18
+`define BASE_TRX_DHB_RAM               12'h800
+`define SIZE_TRX_DHB_RAM               32'h200

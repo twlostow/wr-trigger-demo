@@ -1,0 +1,79 @@
+-- -*- Mode: LUA; tab-width: 2 -*-
+
+peripheral {
+   name = "Trigger TX module";
+   hdl_entity = "trigger_tx_wb";
+   prefix = "ttx";
+
+   reg {
+      name = "Control Register";
+      prefix = "CR";
+
+      field {
+         name = "Enable";
+         description = "Enable trigger broadcasting for given channel";
+         prefix = "ENABLE";
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+         type = BIT;
+      };
+
+      field {
+         name = "Reset counter";
+         description = "Enable trigger broadcasting for given channel";
+         prefix = "RST_CNT";
+         type = MONOSTABLE;
+      };
+
+      field {
+         name = "Broadcast Trigger ID";
+         description = "Enable trigger broadcasting for given channel";
+         prefix = "ID";
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+         type = SLV;
+         size = 16;
+      };
+
+   };
+   
+   reg {
+      name = "TX trigger counter register";
+      prefix = "CNTR";
+     
+      field {
+         name = "Trigger count";
+         size = 32;
+         type = SLV;
+         access_bus = READ_ONLY;
+         access_dev = WRITE_ONLY;
+      };
+   };
+
+   
+   reg {
+      name = "TX trigger adjustment (cycles)";
+      prefix = "ADJ_C";
+     
+      field {
+         name = "Reference clock cycles";
+         size = 28;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+
+   reg {
+      name = "TX trigger adjustment (sub-cycle)";
+      prefix = "ADJ_F";
+
+      field {
+         name = "Fractional part";
+         size = 12;
+         type = SLV;
+         access_bus = READ_WRITE;
+         access_dev = READ_ONLY;
+      };
+   };
+};
