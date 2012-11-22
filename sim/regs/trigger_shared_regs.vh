@@ -1,0 +1,10 @@
+`define ADDR_TTS_CR                    10'h0
+`define TTS_CR_CONFIGURED_OFFSET 0
+`define TTS_CR_CONFIGURED 32'h00000001
+`define TTS_CR_CLEAR_TDB_OFFSET 1
+`define TTS_CR_CLEAR_TDB 32'h00000002
+`define ADDR_TTS_IDR                   10'h4
+`define TTS_IDR_FW_ID_OFFSET 0
+`define TTS_IDR_FW_ID 32'h000000ff
+`define BASE_TTS_TDB_RAM               10'h200
+`define SIZE_TTS_TDB_RAM               32'h80

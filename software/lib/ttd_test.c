@@ -8,7 +8,7 @@ main()
 {
 	eb_device_t dev;
 	ebs_init();
-	ebs_open(&dev, "udp/192.168.0.100");
+	ebs_open(&dev, "udp/192.168.10.11");
 	
 	ebs_write(dev, 0x82000 + TTX_REG_ADJ_C, 1000);
 	ebs_write(dev, 0x82000 + TTX_REG_ADJ_F, 0);

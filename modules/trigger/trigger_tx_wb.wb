@@ -11,7 +11,7 @@ peripheral {
 
       field {
          name = "Enable";
-         description = "Enable trigger broadcasting for given channel";
+         description = "Enable trigger broadcasting for given channel. ";
          prefix = "ENABLE";
          access_bus = READ_WRITE;
          access_dev = READ_ONLY;
@@ -20,14 +20,14 @@ peripheral {
 
       field {
          name = "Reset counter";
-         description = "Enable trigger broadcasting for given channel";
+         description = "Reset input pulse counter";
          prefix = "RST_CNT";
          type = MONOSTABLE;
       };
 
       field {
          name = "Broadcast Trigger ID";
-         description = "Enable trigger broadcasting for given channel";
+         description = "ID of the trigger to be broadcast (please use only bits 11:0)";
          prefix = "ID";
          access_bus = READ_WRITE;
          access_dev = READ_ONLY;
@@ -39,6 +39,7 @@ peripheral {
    
    reg {
       name = "TX trigger counter register";
+      description = "Number of trigger pulses that have come to the input so far...";
       prefix = "CNTR";
      
       field {
@@ -53,6 +54,8 @@ peripheral {
    
    reg {
       name = "TX trigger adjustment (cycles)";
+      description = "Trigger delay adjustment, in 8 ns cycles, added to raw\
+timestamps of incoming pulses";
       prefix = "ADJ_C";
      
       field {
@@ -67,6 +70,8 @@ peripheral {
    reg {
       name = "TX trigger adjustment (sub-cycle)";
       prefix = "ADJ_F";
+      description = "Trigger delay adjustment (fractional part of 8 ns), added to raw\
+timestamps of incoming pulses";
 
       field {
          name = "Fractional part";

@@ -6,7 +6,7 @@
 -- Author     : Tomasz Wlostowski
 -- Company    : CERN
 -- Created    : 2011-08-24
--- Last update: 2012-11-20
+-- Last update: 2012-11-21
 -- Platform   : FPGA-generic
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -339,7 +339,7 @@ architecture rtl of spec_top is
   signal clk_125m_gtp     : std_logic;
   signal clk_sys          : std_logic;
   signal clk_dmtd         : std_logic;
-  signal clk_ref         : std_logic;
+  signal clk_ref          : std_logic;
 
   signal dac_hpll_load_p1 : std_logic;
   signal dac_dpll_load_p1 : std_logic;
@@ -412,8 +412,13 @@ architecture rtl of spec_top is
   signal input_sel                     : std_logic_vector(4 downto 0);
   signal timestamps_in, timestamps_out : t_timestamp_array(4 downto 0);
   signal pll_locked                    : std_logic;
-  signal iserdes_ioclk, iserdes_strobe   : std_logic;
-  signal oserdes_ioclk, oserdes_strobe   : std_logic;
+  signal iserdes_ioclk, iserdes_strobe : std_logic_vector(4 downto 0);
+  signal oserdes_ioclk, oserdes_strobe : std_logic_vector(4 downto 0);
+
+  signal bank0_serdes_ioclk, bank0_serdes_strobe : std_logic;
+  signal bank2_serdes_ioclk, bank2_serdes_strobe : std_logic;
+  
+  
 begin
 
   U_Reset_Generator : spec_reset_gen
@@ -454,13 +459,13 @@ begin
       DIVCLK_DIVIDE      => 1,
       CLKFBOUT_MULT      => 8,
       CLKFBOUT_PHASE     => 0.000,
-      CLKOUT0_DIVIDE     => 8,         -- 125 MHz
+      CLKOUT0_DIVIDE     => 8,          -- 125 MHz
       CLKOUT0_PHASE      => 0.000,
       CLKOUT0_DUTY_CYCLE => 0.500,
       CLKOUT1_DIVIDE     => 1,          -- 1 GHz
       CLKOUT1_PHASE      => 0.000,
       CLKOUT1_DUTY_CYCLE => 0.500,
-      CLKOUT2_DIVIDE     => 16,          -- 62.5 MHz
+      CLKOUT2_DIVIDE     => 16,         -- 62.5 MHz
       CLKOUT2_PHASE      => 0.000,
       CLKOUT2_DUTY_CYCLE => 0.500,
       CLKIN_PERIOD       => 8.0,
@@ -666,7 +671,7 @@ begin
       g_dpram_size                => 90112/4,
       g_interface_mode            => PIPELINED,
       g_address_granularity       => BYTE,
-      g_aux_sdb => c_etherbone_sdb)
+      g_aux_sdb                   => c_etherbone_sdb)
     port map (
       clk_sys_i  => clk_sys,
       clk_dmtd_i => clk_dmtd,
@@ -782,7 +787,7 @@ begin
 
   gen_tbi_phy : if (g_simulation /= 0) generate
 
-    phy_rx_rbclk <= clk_ref;    -- after 1ns;
+    phy_rx_rbclk <= clk_ref;            -- after 1ns;
 
     U_TBI_PHY : wr_tbi_phy
       port map (
@@ -882,34 +887,58 @@ begin
       g_num_outputs => 5,
       g_core_type   => 0)
     port map (
-      clk_sys_i    => clk_sys,
-      rst_n_i      => local_reset_n,
-      timestamps_i => timestamps_in,
-      timestamps_o => timestamps_out,
-      input_sel_o  => input_sel,
-      snk_i        => streamer_snk_in,
-      snk_o        => streamer_snk_out,
-      src_i        => streamer_src_in,
-      src_o        => streamer_src_out,
-      slave_i      => cnx_master_out(c_SLAVE_TRIG_DIST),
-      slave_o      => cnx_master_in(c_SLAVE_TRIG_DIST));
+      clk_sys_i       => clk_sys,
+      rst_n_i         => local_reset_n,
+      tm_time_valid_i => tm_time_valid,
+      tm_seconds_i    => tm_seconds,
+      tm_cycles_i     => tm_cycles,
+      timestamps_i    => timestamps_in,
+      timestamps_o    => timestamps_out,
+      input_sel_o     => input_sel,
+      snk_i           => streamer_snk_in,
+      snk_o           => streamer_snk_out,
+      src_i           => streamer_src_in,
+      src_o           => streamer_src_out,
+      slave_i         => cnx_master_out(c_SLAVE_TRIG_DIST),
+      slave_o         => cnx_master_in(c_SLAVE_TRIG_DIST));
 
   --streamer_src_in.ack <= '1';
   --streamer_src_in.stall <= '0';
   --streamer_src_in.err <= '0';
   --streamer_src_in.rty <= '0';
 
-  U_bufpll_iserdes_inst : BUFPLL
+  U_BufPLL_Bank0 : BUFPLL
     generic map (
       DIVIDE => 8)
     port map (
-      IOCLK        => iserdes_ioclk,
+      IOCLK        => bank0_serdes_ioclk,
       LOCK         => open,
-      SERDESSTROBE => iserdes_strobe,
+      SERDESSTROBE => bank0_serdes_strobe,
       GCLK         => clk_ref,
       LOCKED       => pll_locked,
       PLLIN        => pllout_clk_ref8x);
 
+  U_BufPLL_Bank2 : BUFPLL
+    generic map (
+      DIVIDE => 8)
+    port map (
+      IOCLK        => bank2_serdes_ioclk,
+      LOCK         => open,
+      SERDESSTROBE => bank2_serdes_strobe,
+      GCLK         => clk_ref,
+      LOCKED       => pll_locked,
+      PLLIN        => pllout_clk_ref8x);
+
+  iserdes_ioclk(4 downto 1) <= (others => bank2_serdes_ioclk);
+  oserdes_ioclk(4 downto 1) <= (others => bank2_serdes_ioclk);
+  iserdes_strobe(4 downto 1) <= (others => bank2_serdes_strobe);
+  oserdes_strobe(4 downto 1) <= (others => bank2_serdes_strobe);
+
+  iserdes_ioclk(0) <= bank0_serdes_ioclk;
+  oserdes_ioclk(0) <= bank2_serdes_ioclk;
+  iserdes_strobe(0) <= bank0_serdes_strobe;
+  oserdes_strobe(0) <= bank2_serdes_strobe;
+  
   gen_stampers : for i in 1 to 4 generate
 
     U_StamperX : serdes_pulse_stamper
@@ -928,8 +957,8 @@ begin
         tag_cycles_o    => timestamps_in(i).cycles,
         tag_frac_o      => timestamps_in(i).frac,
         tag_valid_p1_o  => timestamps_in(i).valid,
-        clk_ioclk_i     => iserdes_ioclk,
-        serdes_strobe_i   => iserdes_strobe);
+        clk_ioclk_i     => iserdes_ioclk(i),
+        serdes_strobe_i => iserdes_strobe(i));
 
   end generate gen_stampers;
 
@@ -950,8 +979,8 @@ begin
         trig_frac_i     => timestamps_out(i).frac,
         trig_valid_p1_i => timestamps_out(i).valid,
         duration_i      => x"000007c",
-        clk_ioclk_i     => iserdes_ioclk,
-        serdes_strobe_i => iserdes_strobe
+        clk_ioclk_i     => oserdes_ioclk(i),
+        serdes_strobe_i => oserdes_strobe(i)
         );
   end generate gen_pulse_generators;
 

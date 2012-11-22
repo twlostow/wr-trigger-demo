@@ -5,6 +5,7 @@
 
 `include "regs/trigger_tx_regs.vh"
 `include "regs/trigger_rx_regs.vh"
+`include "regs/trigger_shared_regs.vh"
 
 const uint64_t BASE_TRIG_DIST = 'h0080000;
 
@@ -95,7 +96,9 @@ module main;
       
       acc.write(base + `ADDR_TRX_DELAY_C, delay_c);
       acc.write(base + `ADDR_TRX_DELAY_F, delay_f);
-
+      acc.write(base + `ADDR_TRX_RX_HIST_BIAS, 0);
+      acc.write(base + `ADDR_TRX_RX_HIST_SCALE, 1 << 14);
+      
       $display("TrigID: %x", id);
       
       acc.write(base + `ADDR_TRX_CR, 
@@ -106,7 +109,7 @@ module main;
    endtask // init_trx
    
 
-   time ts_in[$];
+   time ts_in_a[$], ts_in_b[$];
    
    
    initial begin
@@ -122,28 +125,49 @@ module main;
       
 
       #100us;
-      init_ttx(acc_a, BASE_TRIG_DIST + 'h1000, 11, 1);
-      init_trx(acc_b, BASE_TRIG_DIST + 'h6000, 11, 1, 2000, 0);
+      init_ttx(acc_a, BASE_TRIG_DIST + 'h2000, 11, 1);
+      init_ttx(acc_a, BASE_TRIG_DIST + 'h3000, 43, 1);
+      init_trx(acc_b, BASE_TRIG_DIST + 'h7000, 11, 1, 2000, 0);
+      init_trx(acc_b, BASE_TRIG_DIST + 'h8000, 43, 1, 1000, 0);
       #70us;
-      
 
-      forever begin
-         #1us;
-         ts_in.push_back($time);
-         dio_in_a[0] = 1;
-         #100ns;
-         dio_in_a[0] = 0;
-         #16us;
-      end
-      
+      fork
+         
+         forever begin
+            #1us;
+            ts_in_a.push_back($time);
+            dio_in_a[1] = 1;
+            #100ns;
+            dio_in_a[1] = 0;
+            #11us;
+         end
+         
+         forever begin
+            #2us;
+            ts_in_b.push_back($time);
+            dio_in_a[2] = 1;
+            #100ns;
+            dio_in_a[2] = 0;
+            #11us;
+         end
+
+      join
    end
 
-   always@(posedge dio_out_b[0])
+   always@(posedge dio_out_b[1])
      begin
         time t;
-        t = ts_in.pop_front();
+        t = ts_in_a.pop_front();
         
-        $display("Delay : %d", $time - t);
+        $display("DelayA : %d", $time - t);
+        
+     end
+   always@(posedge dio_out_b[1])
+     begin
+        time t;
+        t = ts_in_b.pop_front();
+        
+        $display("DelayB : %d", $time - t);
         
      end
    

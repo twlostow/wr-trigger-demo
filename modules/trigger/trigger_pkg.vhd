@@ -59,17 +59,20 @@ package trigger_pkg is
       g_num_outputs : integer;
       g_core_type   : integer);
     port (
-      clk_sys_i    : in  std_logic;
-      rst_n_i      : in  std_logic;
-      timestamps_i : in  t_timestamp_array(g_num_inputs-1 downto 0);
-      timestamps_o : out t_timestamp_array(g_num_outputs-1 downto 0);
-      input_sel_o  : out std_logic_vector(g_num_inputs-1 downto 0);
-      snk_i        : in  t_wrf_sink_in;
-      snk_o        : out t_wrf_sink_out;
-      src_i        : in  t_wrf_source_in;
-      src_o        : out t_wrf_source_out;
-      slave_i      : in  t_wishbone_slave_in;
-      slave_o      : out t_wishbone_slave_out);
+      clk_sys_i       : in  std_logic;
+      rst_n_i         : in  std_logic;
+      tm_time_valid_i : in  std_logic;
+      tm_seconds_i    : in  std_logic_vector(39 downto 0);
+      tm_cycles_i     : in  std_logic_vector(27 downto 0);
+      timestamps_i    : in  t_timestamp_array(g_num_inputs-1 downto 0);
+      timestamps_o    : out t_timestamp_array(g_num_outputs-1 downto 0);
+      input_sel_o     : out std_logic_vector(g_num_inputs-1 downto 0);
+      snk_i           : in  t_wrf_sink_in;
+      snk_o           : out t_wrf_sink_out;
+      src_i           : in  t_wrf_source_in;
+      src_o           : out t_wrf_source_out;
+      slave_i         : in  t_wishbone_slave_in;
+      slave_o         : out t_wishbone_slave_out);
   end component;
   
 end trigger_pkg;

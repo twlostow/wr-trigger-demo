@@ -1,32 +1,33 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/clk_ref_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/clk_ref8x_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/clk_sys_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/rst_n_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/pll_locked_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/pulse_a_o
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/tm_time_valid_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/tm_utc_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/tm_cycles_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_ready_o
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_seconds_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_cycles_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_frac_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_valid_p1_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/duration_i
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/data
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_valid_ref
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_seconds_sys
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_seconds_ref
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_cycles_sys
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/trig_cycles_ref
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/taps_sys
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/taps_ref
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/rst
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/rst_n_ref
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/state
-add wave -noupdate -expand -group PulseGen0 /main/DUT_B/gen_pulse_generators(0)/U_PulseGen_X/duration_count
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/g_num_triggers
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/clk_sys_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/rst_n_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/trig_id_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/trig_id_valid_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/ram_addr_o
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/ram_data_o
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/ram_data_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/ram_we_o
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/regs_i
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/state
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/addr
+add wave -noupdate -expand -group ScanTrig0 /main/DUT_B/U_TrigDist_Core/U_ScanTriggers/trig_bit
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/g_num_bins
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/g_input_width
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/clk_sys_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/rst_n_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/sample_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/sample_valid_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/ram_addr_o
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/ram_data_o
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/ram_data_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/ram_wr_o
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/regs_i
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/rescaled
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/addr
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/bin_cnt
+add wave -noupdate -expand -group Histo1 /main/DUT_B/U_TrigDist_Core/gen_receivers(1)/U_RXn/U_Histogrammer/state
 add wave -noupdate -expand -group Rx0 /main/DUT_B/U_TrigDist_Core/gen_receivers(0)/U_RXn/clk_sys_i
 add wave -noupdate -expand -group Rx0 /main/DUT_B/U_TrigDist_Core/gen_receivers(0)/U_RXn/rst_n_i
 add wave -noupdate -expand -group Rx0 /main/DUT_B/U_TrigDist_Core/gen_receivers(0)/U_RXn/ts_o
@@ -228,30 +229,6 @@ add wave -noupdate -expand -group Xmit-0 /main/DUT_A/U_TrigDist_Core/gen_transmi
 add wave -noupdate -expand -group Xmit-0 /main/DUT_A/U_TrigDist_Core/gen_transmitters(0)/U_TXn/trig_packet
 add wave -noupdate -expand -group Xmit-0 /main/DUT_A/U_TrigDist_Core/gen_transmitters(0)/U_TXn/state
 add wave -noupdate -expand -group Xmit-0 /main/DUT_A/U_TrigDist_Core/gen_transmitters(0)/U_TXn/counter
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/g_ref_clk_rate
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/rst_n_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/clk_ref8x_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/clk_ref_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/clk_sys_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/pll_locked_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/pulse_a_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tm_time_valid_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tm_utc_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tm_cycles_i
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_utc_o
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_cycles_o
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_frac_o
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_valid_p1_o
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/rst
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/rst_n_ref
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/data
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/output_ready
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_valid_ref
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_valid_sys
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_utc_ref
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_cycles_ref
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/tag_frac_ref
-add wave -noupdate -expand -group Stamper-0 /main/DUT_A/gen_stampers(0)/U_StamperX/looking_for
 add wave -noupdate /main/DUT_A/U_TrigDist_Core/g_num_inputs
 add wave -noupdate /main/DUT_A/U_TrigDist_Core/g_num_outputs
 add wave -noupdate /main/DUT_A/U_TrigDist_Core/g_core_type
@@ -277,8 +254,8 @@ add wave -noupdate /main/DUT_A/U_TrigDist_Core/rq_muxed_valid
 add wave -noupdate /main/DUT_A/U_TrigDist_Core/rx_valid
 add wave -noupdate /main/DUT_A/U_TrigDist_Core/decoded_trig
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {19740256 ps} 0}
-configure wave -namecolwidth 236
+WaveRestoreCursors {{Cursor 1} {111069364 ps} 0}
+configure wave -namecolwidth 427
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -292,4 +269,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {52500480 ps}
+WaveRestoreZoom {0 ps} {304075145 ps}

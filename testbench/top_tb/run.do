@@ -1,5 +1,5 @@
 #make -f Makefile
-vsim -L unisim work.main -voptargs="+acc" -t 1ps
+vsim -L unisim work.main -voptargs="+acc" -t 1ps -novopt
 # -novopt 
  set StdArithNoWarnings 1
 set NumericStdNoWarnings 1

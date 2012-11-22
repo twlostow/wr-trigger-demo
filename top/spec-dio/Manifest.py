@@ -5,6 +5,7 @@ fetchto = "../../ip_cores"
 modules = {
     "local" : ["../../modules", "../../platform" ],
     "git" : [ "git://ohwr.org/hdl-core-lib/wr-cores.git",
-					    "git://ohwr.org/hdl-core-lib/etherbone-core.git" ],
+					    "git://ohwr.org/hdl-core-lib/etherbone-core.git",
+					    "git://ohwr.org/hdl-core-lib/fine-delay.git" ],
     "svn" : [ "http://svn.ohwr.org/gn4124-core/trunk/hdl/gn4124core/rtl" ]
     }

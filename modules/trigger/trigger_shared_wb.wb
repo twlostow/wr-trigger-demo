@@ -2,6 +2,10 @@
 
 peripheral {
    name = "Trigger shared module";
+   description = "Shared module for the trigger distribution core. Allows for: \
+   - checking which triggers are currently broadcast over the network,\
+   - checking the particular card's configuration status and firmware type,\
+   - and nothing more for the time being.";
    hdl_entity = "trigger_shared_wb";
    prefix = "tts";
 
@@ -11,7 +15,7 @@ peripheral {
 
       field {
          name = "Configured";
-         description = "Informs whether the device is already configured";
+         description = "Informs whether the device is already configured. This in particular applies to the Fine Delay-based card, where the FD core needs to be initialized before enabling the trigger distribution core.";
          prefix = "CONFIGURED";
          access_bus = READ_WRITE;
          access_dev = READ_ONLY;
@@ -30,6 +34,7 @@ peripheral {
       prefix = "IDR";
 
       field {
+         name = "FW Type";
          description = "Type of the firmware: 0 = DIO, 1 = Fine Delay";
          prefix = "FW_ID";
          access_bus = READ_ONLY;
@@ -41,8 +46,8 @@ peripheral {
    
    ram {
       name = "Trigger Detection Buffer";
-
-			 size = 32;
+      description = "Each bit represents the presence of broadcast trigger with ID calue corresponding to the bit index in the buffer. For example, word 3 bit 3 set means that the card is receiving a trigger with ID = 32 * 3 + 3";
+			 size = 128;
 			 width = 32;
 			 
 			 access_dev = READ_WRITE;
