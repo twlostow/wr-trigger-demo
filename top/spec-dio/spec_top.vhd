@@ -6,7 +6,7 @@
 -- Author     : Tomasz Wlostowski
 -- Company    : CERN
 -- Created    : 2011-08-24
--- Last update: 2012-11-21
+-- Last update: 2012-11-25
 -- Platform   : FPGA-generic
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -58,7 +58,8 @@ entity spec_top is
   generic
     (
       g_standalone : boolean := true;
-      g_simulation : integer := 0
+      g_simulation : integer := 0;
+      g_with_gennum : integer := 0
       );
   port
     (
@@ -544,6 +545,7 @@ begin
 -- Gennum core
 -------------------------------------------------------------------------------
 
+  gen_with_gennum : if(g_with_gennum /= 0) generate
   cmp_gn4124_core : gn4124_core
     port map
     (
@@ -617,9 +619,14 @@ begin
       dma_reg_cyc_i => '0',
       dma_reg_we_i  => '0'
       );
-
   cnx_slave_in(c_MASTER_GENNUM).adr <= gn_wb_adr(29 downto 0) & "00";
 
+  end generate gen_with_gennum;
+
+  gen_without_gennum : if(g_with_gennum = 0) generate
+    cnx_slave_in(c_MASTER_GENNUM).cyc <= '0';
+  end generate gen_without_gennum;
+  
 -------------------------------------------------------------------------------
 -- Top level interconnect and interrupt controller
 -------------------------------------------------------------------------------
@@ -675,7 +682,7 @@ begin
     port map (
       clk_sys_i  => clk_sys,
       clk_dmtd_i => clk_dmtd,
-      clk_ref_i  => clk_ref,
+      clk_ref_i  => clk_125m_pllref,
       rst_n_i    => local_reset_n,
 
       dac_hpll_load_p1_o => dac_hpll_load_p1,
@@ -683,7 +690,7 @@ begin
       dac_dpll_load_p1_o => dac_dpll_load_p1,
       dac_dpll_data_o    => dac_dpll_data,
 
-      phy_ref_clk_i      => clk_ref,
+      phy_ref_clk_i      => clk_125m_pllref,
       phy_tx_data_o      => phy_tx_data,
       phy_tx_k_o         => phy_tx_k,
       phy_tx_disparity_i => phy_tx_disparity,
@@ -749,7 +756,7 @@ begin
         g_enable_ch1 => 1)
       port map (
         gtp_clk_i          => clk_125m_gtp,
-        ch0_ref_clk_i      => clk_ref,
+        ch0_ref_clk_i      => clk_125m_pllref,
         ch0_tx_data_i      => x"00",
         ch0_tx_k_i         => '0',
         ch0_tx_disparity_o => open,
@@ -762,7 +769,7 @@ begin
         ch0_rst_i          => '1',
         ch0_loopen_i       => '0',
 
-        ch1_ref_clk_i      => clk_ref,
+        ch1_ref_clk_i      => clk_125m_pllref,
         ch1_tx_data_i      => phy_tx_data,
         ch1_tx_k_i         => phy_tx_k,
         ch1_tx_disparity_o => phy_tx_disparity,
@@ -787,7 +794,7 @@ begin
 
   gen_tbi_phy : if (g_simulation /= 0) generate
 
-    phy_rx_rbclk <= clk_ref;            -- after 1ns;
+    phy_rx_rbclk <= clk_125m_pllref;            -- after 1ns;
 
     U_TBI_PHY : wr_tbi_phy
       port map (
@@ -804,8 +811,8 @@ begin
         serdes_rx_k_o         => phy_rx_k,
         serdes_rx_enc_err_o   => phy_rx_enc_err,
         serdes_rx_bitslide_o  => open,
-        tbi_refclk_i          => clk_ref,
-        tbi_rbclk_i           => clk_ref,
+        tbi_refclk_i          => clk_125m_pllref,
+        tbi_rbclk_i           => clk_125m_pllref,
         tbi_td_o              => tbi_td_o,
         tbi_rd_i              => tbi_rd_i);
   end generate gen_tbi_phy;
@@ -946,7 +953,7 @@ begin
         g_ref_clk_rate => 125000000)
       port map (
         rst_n_i         => local_reset_n,
-        clk_ref_i       => clk_ref,
+        clk_ref_i       => clk_125m_pllref,
         clk_sys_i       => clk_sys,
         pll_locked_i    => pll_locked,
         pulse_a_i       => dio_in(i),
@@ -965,7 +972,7 @@ begin
   gen_pulse_generators : for i in 1 to 4 generate
     U_PulseGen_X : serdes_pulse_gen
       port map (
-        clk_ref_i       => clk_ref,
+        clk_ref_i       => clk_125m_pllref,
         clk_sys_i       => clk_sys,
         rst_n_i         => local_reset_n,
         pll_locked_i    => pll_locked,

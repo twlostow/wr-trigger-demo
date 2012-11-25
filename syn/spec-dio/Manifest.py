@@ -9,6 +9,8 @@ syn_package = "fgg484"
 syn_top = "spec_top"
 syn_project = "trigdist-spec-dio.xise"
 
+files =[ "wrc.ram"]
+
 modules = { "local" : 
 						[ "../../top/spec-dio" ] 
 					}
