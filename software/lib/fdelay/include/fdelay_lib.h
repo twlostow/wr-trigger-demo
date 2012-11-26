@@ -66,6 +66,12 @@ PUBLIC API
 */
 
 
+/* Allocates and returns a pointer to a new fdelay_device_t structure. */
+fdelay_device_t *fdelay_create();
+
+//TODO: write full description
+/* Opens a device using location string. Fill in more info. */
+int fdelay_probe(fdelay_device_t *dev, const char *location);
 
 /* Creates a local instance of Fine Delay Core at address base_addr on the SPEC at bus/devfn. Returns 0 on success, negative on error. */
 int spec_fdelay_create_bd(fdelay_device_t *dev, int bus, int dev_fn, uint32_t base);
