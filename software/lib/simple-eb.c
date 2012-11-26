@@ -13,14 +13,11 @@
 
 #include "etherbone.h"
 
-static 	eb_socket_t socket;
-
 static inline void process_result(eb_status_t result)
 {
 	if (result != EB_OK)
 	{
 		printf("Error: %s\n", eb_status(result));
-//		exit(1);
 	}
 	return;
 }
@@ -54,22 +51,29 @@ eb_status_t ebs_block_write(eb_device_t device, eb_address_t address, eb_data_t*
 	eb_cycle_close(cycle);
 	status = eb_device_flush(device);
 
-	while (!write_done) eb_socket_run(socket, 10);		//wait forever
+	eb_socket_t socket = eb_device_socket(device);
+
+    while (!write_done) eb_socket_run(socket, -1);		//wait forever
 
 	return status;
 }
 
 eb_status_t ebs_block_read(eb_device_t device, eb_address_t read_address, eb_data_t *rdata, int count, int autoincrement_address)
 {
-	int read_done = 0;
-	void rd_callback(eb_user_data_t data, eb_device_t device, eb_operation_t op, eb_status_t status)
+    volatile int read_done = 0;
+
+    eb_status_t status;
+
+    void rd_callback(eb_user_data_t data, eb_device_t device, eb_operation_t op, eb_status_t lstatus)
 	{
 		static int c = 0;
 
-		if (status != EB_OK)
+        if (lstatus != EB_OK)
 		{
 			fprintf(stderr, "read failed: %s\n", eb_status(status));
-			exit(-1);
+            status = lstatus;
+            read_done = 1;
+            return;
 		}
 
 		for(; op != EB_NULL; op = eb_operation_next(op)) {
@@ -81,9 +85,9 @@ eb_status_t ebs_block_read(eb_device_t device, eb_address_t read_address, eb_dat
 	}
 
 	eb_cycle_t cycle;
-	eb_status_t status = eb_cycle_open(device, NULL, rd_callback, &cycle);
+    status = eb_cycle_open(device, NULL, rd_callback, &cycle);
 	if (status != EB_OK)
-			return status;
+        return status;
 
 	int i;
 	for (i = 0; i < count; i++)
@@ -96,7 +100,8 @@ eb_status_t ebs_block_read(eb_device_t device, eb_address_t read_address, eb_dat
 	eb_cycle_close(cycle);
 	status = eb_device_flush(device);
 
-	while (!read_done) eb_socket_run(socket, -1);		//wait forever
+    while (!read_done)
+        eb_socket_run(eb_device_socket(device), -1);		//wait forever
 
 	return status;
 }
@@ -115,20 +120,28 @@ void ebs_write(eb_device_t device, eb_address_t addr, eb_data_t data)
 
 eb_status_t ebs_init()
 {
-	eb_status_t status = EB_OK;
+	//eb_status_t status = EB_OK;
 
-	status = eb_socket_open(EB_ABI_CODE, 0, EB_DATA32 | EB_ADDR32, &socket);
-	process_result(status);
+	//status = eb_socket_open(EB_ABI_CODE, 0, EB_DATA32 | EB_ADDR32, &socket);
+	//process_result(status);
+	return EB_OK;
 }
 
 eb_status_t ebs_shutdown()
 {
-	return eb_socket_close(socket);
+	//return eb_socket_close(socket);
+	return EB_OK;
 }
 
 eb_status_t ebs_open(eb_device_t *dev, const char *network_address)
 {
 	eb_status_t status = EB_OK;
+	eb_socket_t socket;
+
+	status = eb_socket_open(EB_ABI_CODE, 0, EB_DATA32 | EB_ADDR32, &socket);
+	process_result(status);
+	if (status != EB_OK)
+		return status;
 
 	status = eb_device_open(socket, network_address, EB_DATA32 | EB_ADDR32, 5, dev);
 	process_result(status);
@@ -137,7 +150,14 @@ eb_status_t ebs_open(eb_device_t *dev, const char *network_address)
 
 eb_status_t ebs_close(eb_device_t dev)
 {
-	return eb_device_close(dev);
+	eb_socket_t socket = eb_device_socket(dev);
+
+	eb_status_t status = eb_device_close(dev);
+	process_result(status);
+	if (status != EB_OK)
+		return status;
+
+	return  eb_socket_close(socket);
 }
 
 struct bus_record {
@@ -152,6 +172,7 @@ int ebs_sdb_find_device(eb_device_t dev, uint32_t vendor, uint32_t device, int s
 	struct bus_record br;
 	int done = 0, found = 0, n = 0;
 	
+	eb_socket_t socket = eb_device_socket(dev);
 		
 	void  scan_cb(eb_user_data_t user, eb_device_t dev, sdb_t sdb, eb_status_t status) {
 	  struct bus_record br;
@@ -200,7 +221,7 @@ int ebs_sdb_find_device(eb_device_t dev, uint32_t vendor, uint32_t device, int s
 		return -1;
 
 	while(!done && !found) // fixme: crap code
-		eb_socket_run(eb_device_socket(dev), -1);
+		eb_socket_run(socket, -1);
 
 	return found;
 }
