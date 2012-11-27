@@ -123,6 +123,17 @@ begin  -- rtl
     end if;
   end process;
 
+  p_latch_input : process(clk_ref_i)
+    begin
+      if rising_edge(clk_ref_i) then
+        if(trig_valid_ref = '1' and tm_time_valid_i = '1') then
+          trig_cycles_ref  <= trig_cycles_sys;
+          trig_seconds_ref <= trig_seconds_sys;
+          taps_ref         <= taps_sys;
+        end if;
+      end if;
+    end process;
+  
   p_fsm : process(clk_ref_i)
   begin
     if rising_edge(clk_ref_i) then
@@ -136,10 +147,7 @@ begin  -- rtl
             data <= (others => '0');
 
             if(trig_valid_ref = '1' and tm_time_valid_i = '1') then
-              trig_cycles_ref  <= trig_cycles_sys;
-              trig_seconds_ref <= trig_seconds_sys;
-              taps_ref         <= taps_sys;
-              state            <= EXEC_TRIGGER;
+              state <= EXEC_TRIGGER;
             end if;
 
           when EXEC_TRIGGER =>
