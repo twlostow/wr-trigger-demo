@@ -29,7 +29,7 @@ end trigger_detect;
 
 architecture rtl of trigger_detect is
   
-  type t_state is (CLEAR_MEM, WAIT_SAMPLE, FETCH, UPDATE);
+  type t_state is (CLEAR_MEM, WAIT_SAMPLE, FETCH1,FETCH2, UPDATE);
 
   signal state    : t_state;
   signal addr     : unsigned(6 downto 0);
@@ -45,7 +45,7 @@ architecture rtl of trigger_detect is
   
 begin  -- rtl
 
-  ram_data_o <= (others => '0') when (state = CLEAR_MEM or state = FETCH)
+  ram_data_o <= (others => '0') when (state = CLEAR_MEM or state = FETCH1 or state = FETCH2)
                 else ram_data_i or f_onehot_encode(trig_bit(4 downto 0));
 
   p_fsm : process(clk_sys_i)
@@ -70,10 +70,13 @@ begin  -- rtl
             if(trig_id_valid_i = '1') then
               addr     <= unsigned(trig_id_i(11 downto 5));
               trig_bit <= trig_id_i(4 downto 0);
-              state    <= FETCH;
+              state    <= FETCH1;
             end if;
 
-          when FETCH =>
+          when FETCH1 =>
+            state <= FETCH2;
+
+          when FETCH2 =>
             state <= UPDATE;
 
           when UPDATE =>
