@@ -6,7 +6,7 @@
 -- Author     : Tomasz Wlostowski
 -- Company    : CERN
 -- Created    : 2011-08-24
--- Last update: 2012-11-25
+-- Last update: 2012-11-27
 -- Platform   : FPGA-generic
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -308,8 +308,8 @@ architecture rtl of spec_top is
 
   constant c_INTERCONNECT_LAYOUT : t_sdb_record_array(c_NUM_WB_MASTERS-1 downto 0) :=
     (c_SLAVE_WRCORE    => f_sdb_embed_bridge(c_WRCORE_BRIDGE_SDB, x"000c0000"),
-     c_SLAVE_FD        => f_sdb_embed_device(c_FD_SDB_DEVICE, x"00080000"),
-     c_SLAVE_TRIG_DIST => f_sdb_embed_bridge(c_TRIGDIST_BRIDGE_SDB, x"00090000"));
+     c_SLAVE_FD        => f_sdb_embed_device(c_FD_SDB_DEVICE, x"00090000"),
+     c_SLAVE_TRIG_DIST => f_sdb_embed_bridge(c_TRIGDIST_BRIDGE_SDB, x"00080000"));
 
   constant c_SDB_ADDRESS : t_wishbone_address := x"00000000";
 
@@ -409,6 +409,9 @@ architecture rtl of spec_top is
   signal fd_outx_cycles  : std_logic_vector(28 * 4 -1 downto 0);
   signal fd_outx_frac    : std_logic_vector(12 * 4 -1 downto 0);
   signal fd_outx_valid   : std_logic_vector(3 downto 0);
+
+  signal sim_wb_adr, sim_wb_dat_in, sim_wb_dat_out: std_logic_vector(31 downto 0);
+  signal sim_wb_cyc, sim_wb_stb, sim_wb_we, sim_wb_ack, sim_wb_stall : std_logic := '0';
   
 begin
 
@@ -608,7 +611,15 @@ begin
   end generate gen_with_gennum;
 
   gen_without_gennum : if(g_with_gennum = 0) generate
-    cnx_slave_in(c_MASTER_GENNUM).cyc <= '0';
+    cnx_slave_in(c_MASTER_GENNUM).cyc <= sim_wb_cyc;
+    cnx_slave_in(c_MASTER_GENNUM).sel <= (others => '1');
+    cnx_slave_in(c_MASTER_GENNUM).adr <= sim_wb_adr;
+    cnx_slave_in(c_MASTER_GENNUM).dat <= sim_wb_dat_in;
+    cnx_slave_in(c_MASTER_GENNUM).stb <= sim_wb_stb;
+    cnx_slave_in(c_MASTER_GENNUM).we <= sim_wb_we;
+    sim_wb_stall <= cnx_slave_out(c_MASTER_GENNUM).stall;
+    sim_wb_ack <= cnx_slave_out(c_MASTER_GENNUM).ack;
+    sim_wb_dat_out <=cnx_slave_out(c_MASTER_GENNUM).dat;
   end generate gen_without_gennum;
 
 -------------------------------------------------------------------------------

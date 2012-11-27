@@ -914,16 +914,16 @@ begin
   --streamer_src_in.err <= '0';
   --streamer_src_in.rty <= '0';
 
-  U_BufPLL_Bank0 : BUFPLL
-    generic map (
-      DIVIDE => 8)
-    port map (
-      IOCLK        => bank0_serdes_ioclk,
-      LOCK         => open,
-      SERDESSTROBE => bank0_serdes_strobe,
-      GCLK         => clk_ref,
-      LOCKED       => pll_locked,
-      PLLIN        => pllout_clk_ref8x);
+  --U_BufPLL_Bank0 : BUFPLL
+  --  generic map (
+  --    DIVIDE => 8)
+  --  port map (
+  --    IOCLK        => bank0_serdes_ioclk,
+  --    LOCK         => open,
+  --    SERDESSTROBE => bank0_serdes_strobe,
+  --    GCLK         => clk_ref,
+  --    LOCKED       => pll_locked,
+  --    PLLIN        => pllout_clk_ref8x);
 
   U_BufPLL_Bank2 : BUFPLL
     generic map (
@@ -941,9 +941,9 @@ begin
   iserdes_strobe(4 downto 1) <= (others => bank2_serdes_strobe);
   oserdes_strobe(4 downto 1) <= (others => bank2_serdes_strobe);
 
-  iserdes_ioclk(0) <= bank0_serdes_ioclk;
+--  iserdes_ioclk(0) <= bank0_serdes_ioclk;
   oserdes_ioclk(0) <= bank2_serdes_ioclk;
-  iserdes_strobe(0) <= bank0_serdes_strobe;
+--  iserdes_strobe(0) <= bank0_serdes_strobe;
   oserdes_strobe(0) <= bank2_serdes_strobe;
   
   gen_stampers : for i in 1 to 4 generate
