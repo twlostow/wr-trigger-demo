@@ -190,5 +190,8 @@ begin  -- rtl
   rx_dreq_o <= '1';
 
   ts_o <= adjusted_ts;
+
+  regs_in.cntr_rx_i <= std_logic_vector(rx_count);
+  regs_in.cntr_exec_i <= std_logic_vector(rx_count);
   
 end rtl;

@@ -73,6 +73,12 @@ fdelay_device_t *fdelay_create();
 /* Opens a device using location string. Fill in more info. */
 int fdelay_probe(fdelay_device_t *dev, const char *location);
 
+//TODO: add description
+int  fdelay_configure_sync(fdelay_device_t*, int);
+//int fdelay_configure_output(fdelay_device_t*, int, int, int, int, int, int);
+int fdelay_configure_output(fdelay_device_t *dev, int channel, int enable, int64_t delay_ps, int64_t width_ps, int64_t delta_ps, int rep_count);
+
+
 /* Creates a local instance of Fine Delay Core at address base_addr on the SPEC at bus/devfn. Returns 0 on success, negative on error. */
 int spec_fdelay_create_bd(fdelay_device_t *dev, int bus, int dev_fn, uint32_t base);
 

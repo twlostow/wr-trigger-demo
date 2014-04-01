@@ -108,12 +108,11 @@ void mi2c_init(fdelay_device_t *dev)
 void mi2c_scan(fdelay_device_t *dev)
 {
  	int i;
- 	fprintf(stderr,"Mi2c-scan\n");
  	for(i=0;i<256;i+=2)
  	{
  	 	mi2c_start(dev);
 		if(!mi2c_put_byte(dev,i))
-			fprintf(stderr, "Found I2C device at 0x%x\n", i>>1);
+			printf("Found device at 0x%x\n", i>>1);
 		mi2c_stop(dev);
 
  	}
@@ -123,13 +122,11 @@ int eeprom_read(fdelay_device_t *dev, uint8_t i2c_addr, uint32_t offset, uint8_t
 {
 	int i;
 	unsigned char c;
-
 	for(i=0;i<size;i++)
 	{
  	mi2c_start(dev);
 	if(mi2c_put_byte(dev, i2c_addr << 1) < 0)
  	{
- 		fprintf(stderr,"NACk?");
  	 	mi2c_stop(dev);
  	 	return -1;
   	}
@@ -145,7 +142,6 @@ int eeprom_read(fdelay_device_t *dev, uint8_t i2c_addr, uint32_t offset, uint8_t
 	*buf++ = c;
  	mi2c_stop(dev);
  	}
-
  	return size;
 }
 

@@ -9,72 +9,80 @@
 #include "fdelay_lib.h"
 
 
+int config_output(eb_device_t dev,int out, int id, int delay)
+{
+
+
+	ebs_write(dev, 0x86000 + out * 0x1000+TRX_REG_CR, 0);
+	ebs_write(dev, 0x86000 + out * 0x1000+TRX_REG_DELAY_C, delay);
+	ebs_write(dev, 0x86000 + out * 0x1000+TRX_REG_DELAY_F, 10);
+	ebs_write(dev, 0x86000 + out * 0x1000+ TRX_REG_CR, TRX_CR_ENABLE | TRX_CR_RST_CNT| TRX_CR_RST_HIST| TRX_CR_ID_W(id));
+
+}
+
+int rx_stats(eb_device_t dev,int out)
+{
+	int i;
+		printf("TrigCR: %x\n", ebs_read(dev, 0x86000 +out*0x1000+ TRX_REG_CR));
+		for(i=0;i<512;i++)
+		{
+			printf("%04d ", ebs_read(dev, 0x89000 +out*0x1000+ TRX_DHB_RAM_BASE + i*4));
+			if(i%16==0)
+			printf("\n");
+		}
+
+
+
+}
+
 main(int argc, char *argv[])
 {
-	eb_device_t dev, dev1,dev2;
+	eb_device_t dev;
 	uint32_t tmp [1024];
 	int i=0, count = argc > 1 ? atoi(argv[1]) : 4;
-
-#if 1
-
-	fdelay_device_t *fd = fdelay_create();
-	fdelay_probe(fd, "eb:192.168.10.104");
-	
-	fdelay_time_t t;
-	memset(&t, 0, sizeof(t));
-	fdelay_init(fd, 0);
-
-	fdelay_configure_sync(fd, FDELAY_SYNC_WR);
-	fdelay_configure_trigger(fd, 1, 1);
-	while(!fdelay_check_sync(fd))
-	{
-		fprintf(stderr,".");
-		sleep(1);
-	}
-	fprintf(stderr,"\n");
-	
-	fdelay_configure_output(fd, 1, 1, 500000, 500000, 1000000, 1);
-
-
-
-	fdelay_release(fd);
-#endif
-//	return 0;
-#if 0
-	for(;;)
-	{
-  	ebs_block_read(dev, 0, tmp, count, 1);
-
-	//	for(i=0;i<count;i++)
-	//		printf("%03x: %08x\n", i, tmp[i]);
-		i++;
-		fprintf(stderr,"%d\n", i);
-	}
-#endif
-	
-
+	int configured = 1;
 	ebs_init();
-	ebs_open(&dev1,  "udp/192.168.10.101");
 	
-	ebs_write(dev1, 0x82000 + TTX_REG_ADJ_C, 0);
-	ebs_write(dev1, 0x82000 + TTX_REG_ADJ_F, 0);
-	ebs_write(dev1, 0x82000 + TTX_REG_CR, TTX_CR_ENABLE | TTX_CR_RST_CNT | (11 << TTX_CR_ID_SHIFT));
-
-	ebs_open(&dev2,  "udp/192.168.10.104");
+	ebs_open(&dev,  "udp/192.168.10.12");
+	if(configured)
+		ebs_write(dev, 0x80000 + TTS_REG_CR, TTS_CR_CONFIGURED);
 	
-	ebs_write(dev2, 0x82000 + TRX_REG_DELAY_C, 3000);
-	ebs_write(dev2, 0x82000 + TRX_REG_DELAY_F, 0);
-	ebs_write(dev2, 0x82000 + TRX_REG_CR, TRX_CR_ENABLE | (11 << TRX_CR_ID_SHIFT));
-
-
+	ebs_write(dev, 0x82000 + TTX_REG_ADJ_C, 0);
+	ebs_write(dev, 0x82000 + TTX_REG_ADJ_F, 0);
+	ebs_write(dev, 0x82000 + TTX_REG_CR, TTX_CR_ENABLE | TTX_CR_RST_CNT | TTX_CR_ID_W(1));
 	
-	for(;;)
+//	for(;;)
 	{
-		printf("TXTrigCnt: %d\n", ebs_read(dev1, 0x82000 + TTX_REG_CNTR));
-		printf("RXTrigCnt: %d\n", ebs_read(dev2, 0x82000 + TRX_REG_CNTR_RX));
 		sleep(1);
+		printf("TrigCR: %x\n", ebs_read(dev, 0x82000 + TTX_REG_CR));
+		printf("TrigADJ: %x\n", ebs_read(dev, 0x82000 + TTX_REG_ADJ_C));
+		printf("TrigCnt: %d\n", ebs_read(dev, 0x82000 + TTX_REG_CNTR));
 	}
+
+	ebs_close(dev);
+	ebs_open(&dev,  "udp/192.168.10.13");
+//	if(configured)
+//		ebs_write(dev, 0x80000 + TTS_REG_CR, TTS_CR_CONFIGURED);
+
+	ebs_write(dev, 0x81000 + TTX_REG_CR, 0);
+	ebs_write(dev, 0x82000 + TTX_REG_CR, 0);
+	ebs_write(dev, 0x83000 + TTX_REG_CR, 0);
+	ebs_write(dev, 0x84000 + TTX_REG_CR, 0);
+	ebs_write(dev, 0x85000 + TTX_REG_CR, 0);
+
+	config_output(dev, 0, 1, 5000);
+	config_output(dev, 1, 1, 5000);
+	config_output(dev, 2, 1, 5000);
+	config_output(dev, 3, 1, 5000);
+	config_output(dev, 4, 1, 5000);
 	
+
+	for(;;){
+//		sleep(1);
+		 rx_stats(dev, 1);
+
+	}
+	ebs_close(dev);
 	return 0;
 }
 

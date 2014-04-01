@@ -138,6 +138,8 @@ eb_status_t ebs_open(eb_device_t *dev, const char *network_address)
 	eb_status_t status = EB_OK;
 	eb_socket_t socket;
 
+	printf("Address: %s\n", network_address);
+
 	status = eb_socket_open(EB_ABI_CODE, 0, EB_DATA32 | EB_ADDR32, &socket);
 	process_result(status);
 	if (status != EB_OK)

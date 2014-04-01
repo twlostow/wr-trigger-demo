@@ -3,6 +3,9 @@
 `include "gn4124_bfm.svh"
 `include "if_wb_master.svh"
 
+`include "fdelay_board.svh"
+`include "simdrv_fine_delay.svh"
+
 `include "regs/trigger_tx_regs.vh"
 `include "regs/trigger_rx_regs.vh"
 `include "regs/trigger_shared_regs.vh"
@@ -21,17 +24,54 @@ module main;
 
    initial #200ns rst_n = 1;
    
-   
-   IGN4124PCIMaster I_GennumA ();
-   IGN4124PCIMaster I_GennumB ();
 
    reg [4:0] dio_in_a = 0;
    reg [4:0] dio_in_b= 0;
    wire [4:0] dio_out_a;
    wire [4:0] dio_out_b;   
    wire [9:0] a2b, b2a;
+      
 
+   assign DUT_A.sim_wb_cyc = I_WBA.cyc;
+   assign DUT_A.sim_wb_stb = I_WBA.stb;
+   assign DUT_A.sim_wb_we = I_WBA.we;
+   assign DUT_A.sim_wb_adr = I_WBA.adr;
+   assign DUT_A.sim_wb_dat_in = I_WBA.dat_o;
+
+   assign I_WBA.ack = DUT_A.sim_wb_ack;
+   assign I_WBA.stall = DUT_A.sim_wb_stall;
+   assign I_WBA.dat_i = DUT_A.sim_wb_dat_out;
+
+   assign DUT_B.sim_wb_cyc = I_WBB.cyc;
+   assign DUT_B.sim_wb_stb = I_WBB.stb;
+   assign DUT_B.sim_wb_we = I_WBB.we;
+   assign DUT_B.sim_wb_adr = I_WBB.adr;
+   assign DUT_B.sim_wb_dat_in = I_WBB.dat_o;
+
+   assign I_WBB.ack = DUT_B.sim_wb_ack;
+   assign I_WBB.stall = DUT_B.sim_wb_stall;
+   assign I_WBB.dat_i = DUT_B.sim_wb_dat_out;
    
+   IFineDelayFMC I_fmc0(), I_fmc1();
+
+   reg        trig_a, trig_b = 0;
+   wire [3:0] out_a, out_b;
+   
+   
+   fdelay_board U_BoardA
+     (
+      .trig_i(trig_a),
+      .out_o(out_a),
+      .fmc(I_fmc0.board)
+      );
+
+   fdelay_board U_BoardB
+     (
+      .trig_i(trig_b),
+      .out_o(out_b),
+      .fmc(I_fmc1.board)
+      );
+
    spec_top
      #(
        .g_simulation(1)
@@ -44,14 +84,13 @@ module main;
           .clk_125m_gtp_n_i(~clk_125m_pllref),
           
           .clk_20m_vcxo_i(clk_20m_vcxo),
+          .l_rst_n(1'b1),
 
-          `GENNUM_WIRE_SPEC_PINS(I_GennumA),
+//          `GENNUM_WIRE_SPEC_PINS(I_GennumA),
+          `WIRE_FINE_DELAY_PINS_SINGLE(I_fmc0),
 
-          .dio_n_i(~dio_in_a),
-          .dio_p_i(dio_in_a),
 
-          .dio_p_o(dio_out_a),
-
+       
           .tbi_td_o(a2b),
           .tbi_rd_i(b2a)
 	  );
@@ -68,23 +107,19 @@ module main;
           .clk_125m_gtp_n_i(~clk_125m_pllref),
           
           .clk_20m_vcxo_i(clk_20m_vcxo),
-
-          `GENNUM_WIRE_SPEC_PINS(I_GennumB),
-
-          .dio_n_i(~dio_in_b),
-          .dio_p_i(dio_in_b),
-
-          .dio_p_o(dio_out_b),
+          .l_rst_n(1'b1),
+  //        `GENNUM_WIRE_SPEC_PINS(I_GennumB),
+          `WIRE_FINE_DELAY_PINS_SINGLE(I_fmc1),
 
           .tbi_rd_i(a2b),
           .tbi_td_o(b2a)
 
 	  );
 
+   IWishboneMaster #(32, 32) I_WBA (DUT_A.clk_sys, rst_n);
+   IWishboneMaster #(32, 32) I_WBB (DUT_B.clk_sys, rst_n);
    
    task init_ttx(CBusAccessor acc, int base, int id, int enable, int adjust_c = 0, int adjust_f = 0);
-
-      acc.set_default_xfer_size(4);
       
       acc.write(base + `ADDR_TTX_ADJ_C, adjust_c);
       acc.write(base + `ADDR_TTX_ADJ_F, adjust_f);
@@ -96,8 +131,6 @@ module main;
    endtask // init_ttx
 
    task init_trx(CBusAccessor acc, int base, int id, int enable, int delay_c = 0, int delay_f = 0);
-
-      acc.set_default_xfer_size(4);
       
       acc.write(base + `ADDR_TRX_DELAY_C, delay_c);
       acc.write(base + `ADDR_TRX_DELAY_F, delay_f);
@@ -118,64 +151,59 @@ module main;
    
    
    initial begin
-      CBusAccessor acc_a, acc_b;
-      
-      acc_a = I_GennumA.get_accessor();
-      acc_b = I_GennumB.get_accessor();
-      
-      @(posedge I_GennumA.ready);
+      CWishboneAccessor acc_a, acc_b;
+      CSimDrv_FineDelay drv_a, drv_b;
+      Timestamp dly;
 
-      if(!I_GennumB.ready)
-        @(posedge I_GennumB.ready);
+      trig_a = 0;
+
+      #1us;
+
+      trig_a = 1;
+
+      #1us;
+
+      trig_a = 0;
       
+      I_WBA.settings.cyc_on_stall = 1;
+      I_WBB.settings.cyc_on_stall = 1;
+      I_WBA.settings.addr_gran = BYTE;
+      I_WBB.settings.addr_gran = BYTE;
+      
+      acc_a = I_WBA.get_accessor();
+      acc_b = I_WBB.get_accessor();
+      acc_a.set_mode(PIPELINED);
+      acc_b.set_mode(PIPELINED);
+
+      #6us;
+
+//      acc_a.write('h1234, 'hdeadbeef);
+      
+      
+      drv_a = new(acc_a, 'h90000);
+      drv_a.init();
+      drv_b = new(acc_b, 'h90000);
+      drv_b.init();
+      
+      dly=new;
+      dly.from_ps(500000);
+      drv_b.config_output(0, CSimDrv_FineDelay::DELAY, 1, dly, 200000);
+      
+      init_ttx(acc_a, BASE_TRIG_DIST + 'h1000, 11, 1);
+      init_trx(acc_b, BASE_TRIG_DIST + 'h2000, 11, 1, 2000, 0);
 
       #100us;
-      init_ttx(acc_a, BASE_TRIG_DIST + 'h2000, 11, 1);
-      init_ttx(acc_a, BASE_TRIG_DIST + 'h3000, 43, 1);
-      init_trx(acc_b, BASE_TRIG_DIST + 'h7000, 11, 1, 2000, 0);
-      init_trx(acc_b, BASE_TRIG_DIST + 'h8000, 43, 1, 1000, 0);
-      #70us;
-
-      fork
-         
-         forever begin
-            #1us;
-            ts_in_a.push_back($time);
-            dio_in_a[1] = 1;
-            #100ns;
-            dio_in_a[1] = 0;
-            #11us;
-         end
-         
-         forever begin
-            #2us;
-            ts_in_b.push_back($time);
-            dio_in_a[2] = 1;
-            #100ns;
-            dio_in_a[2] = 0;
-            #11us;
-         end
-
-      join
+      
+      forever begin
+         trig_a = 1;
+         #1us;
+         trig_a = 0;
+         #6us;
+      end
+      
+           
+      
    end
-
-   always@(posedge dio_out_b[1])
-     begin
-        time t;
-        t = ts_in_a.pop_front();
-        
-        $display("DelayA : %d", $time - t);
-        
-     end
-   always@(posedge dio_out_b[1])
-     begin
-        time t;
-        t = ts_in_b.pop_front();
-        
-        $display("DelayB : %d", $time - t);
-        
-     end
-   
    
    
 endmodule // main

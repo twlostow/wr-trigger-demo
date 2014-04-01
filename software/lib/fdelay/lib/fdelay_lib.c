@@ -831,8 +831,7 @@ static int read_calibration_eeprom(fdelay_device_t *dev, struct fine_delay_calib
  	struct fine_delay_calibration cal;
 
  	mi2c_init(dev);
-	mi2c_scan(dev);
-	
+
  	if(eeprom_read(dev, EEPROM_ADDR, 0, (uint8_t *) &cal, sizeof(struct fine_delay_calibration)) != sizeof(struct fine_delay_calibration))
  	{
  	    dbg("Can't read calibration EEPROM.\n");
