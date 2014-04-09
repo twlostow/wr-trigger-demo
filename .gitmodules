@@ -1,0 +1,15 @@
+[submodule "ip_cores/general-cores"]
+	path = ip_cores/general-cores
+	url = git://ohwr.org/hdl-core-lib/general-cores.git
+[submodule "ip_cores/wr-cores"]
+	path = ip_cores/wr-cores
+	url = git://ohwr.org/hdl-core-lib/wr-cores.git
+[submodule "ip_cores/fine-delay"]
+	path = ip_cores/fine-delay
+	url = git://ohwr.org/fmc-projects/fmc-delay-1ns-8cha.git
+[submodule "ip_cores/gn4124-core"]
+	path = ip_cores/gn4124-core
+	url = git://ohwr.org/hdl-core-lib/gn4124-core.git
+[submodule "ip_cores/etherbone-core"]
+	path = ip_cores/etherbone-core
+	url = git://ohwr.org/hdl-core-lib/etherbone-core.git
